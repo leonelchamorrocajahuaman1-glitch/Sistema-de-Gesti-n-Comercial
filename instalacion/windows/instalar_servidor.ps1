@@ -58,6 +58,13 @@ $raiz = @((Join-Path $PSScriptRoot ".."), (Join-Path $PSScriptRoot "..\..")) |
         Where-Object { Test-Path (Join-Path $_ "sql\01_esquema.sql") } | Select-Object -First 1
 if (-not $raiz) { throw "No se encontró la carpeta 'sql'. Descomprima el paquete completo." }
 $raiz = (Resolve-Path $raiz).Path
+try { Start-Transcript -Path (Join-Path $raiz "instalacion.log") -Force | Out-Null } catch { }
+trap {
+    Write-Host "`nERROR: $_" -ForegroundColor Red
+    Write-Host "Envíe una foto de esta ventana o el archivo instalacion.log para recibir ayuda." -ForegroundColor Yellow
+    try { Stop-Transcript | Out-Null } catch { }
+    exit 1
+}
 $sqlDir = Join-Path $raiz "sql"
 $jar = Join-Path $raiz "sistema-gestion.jar"
 
@@ -242,3 +249,4 @@ if ($ips.Count -gt 0) {
     Write-Host "   IP de este servidor: $($ips[0].IPAddress)  (fíjela en el router para que no cambie)" -ForegroundColor Yellow
 }
 Start-Process -FilePath $javaw -ArgumentList "-jar `"$jar`"" -WorkingDirectory $raiz
+try { Stop-Transcript | Out-Null } catch { }
