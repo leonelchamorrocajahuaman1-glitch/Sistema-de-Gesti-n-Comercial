@@ -177,24 +177,3 @@ LANGUAGE sql STABLE AS $$
       FROM inventario.stock s WHERE s.cantidad < 0;
 $$;
 
--- -----------------------------------------------------------------------------
---  Endurecimiento: cada rutina resuelve nombres en su propio esquema,
---  independientemente del search_path de la sesión que la invoque.
---  (fn_autorizar_motor se excluye: una cláusula SET revertiría su set_config.)
--- -----------------------------------------------------------------------------
-DO $$
-DECLARE
-    v_rutina record;
-BEGIN
-    FOR v_rutina IN
-        SELECT p.oid::regprocedure AS firma, p.prokind
-          FROM pg_proc p
-         WHERE p.pronamespace = 'inventario'::regnamespace
-           AND p.proname <> 'fn_autorizar_motor'
-    LOOP
-        EXECUTE format('ALTER %s %s SET search_path = inventario, pg_temp',
-                       CASE v_rutina.prokind WHEN 'p' THEN 'PROCEDURE' ELSE 'FUNCTION' END,
-                       v_rutina.firma);
-    END LOOP;
-END;
-$$;

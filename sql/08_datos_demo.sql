@@ -11,12 +11,16 @@ INSERT INTO almacen (codigo, nombre, direccion) VALUES
 INSERT INTO categoria (nombre) VALUES ('Abarrotes'), ('Lácteos'), ('Ferretería');
 
 INSERT INTO producto (codigo, nombre, categoria_id, unidad_medida, metodo_valuacion,
-                      controla_lote, controla_vencimiento, dias_alerta_vencimiento) VALUES
-    ('ARR-001', 'Arroz extra 5 kg',        1, 'BOL', 'PROMEDIO', false, false, 30),
-    ('ACE-001', 'Aceite vegetal 1 L',      1, 'BOT', 'PEPS',     true,  true,  60),
-    ('LEC-001', 'Leche evaporada 400 g',   2, 'LAT', 'PROMEDIO', true,  true,  30),
-    ('YOG-001', 'Yogurt fresa 1 L',        2, 'BOT', 'PEPS',     true,  true,  10),
-    ('TOR-001', 'Tornillo autorroscante',  3, 'CJA', 'PEPS',     false, false, 30);
+                      controla_lote, controla_vencimiento, dias_alerta_vencimiento, precio_venta) VALUES
+    ('ARR-001', 'Arroz extra 5 kg',        1, 'BOL', 'PROMEDIO', false, false, 30, 24.90),
+    ('ACE-001', 'Aceite vegetal 1 L',      1, 'BOT', 'PEPS',     true,  true,  60,  9.50),
+    ('LEC-001', 'Leche evaporada 400 g',   2, 'LAT', 'PROMEDIO', true,  true,  30,  4.20),
+    ('YOG-001', 'Yogurt fresa 1 L',        2, 'BOT', 'PEPS',     true,  true,  10,  7.50),
+    ('TOR-001', 'Tornillo autorroscante',  3, 'CJA', 'PEPS',     false, false, 30, 18.00);
+
+-- Usuarios de ejemplo (contraseña inicial: demo123).
+CALL sp_guardar_usuario(NULL, 'jperez', 'Juan Pérez',  'VENDEDOR',   1, true, 'demo123');
+CALL sp_guardar_usuario(NULL, 'mrojas', 'María Rojas', 'ALMACENERO', 1, true, 'demo123');
 
 CALL sp_configurar_stock_minimo(1, 'ARR-001', 40);
 CALL sp_configurar_stock_minimo(1, 'LEC-001', 100);

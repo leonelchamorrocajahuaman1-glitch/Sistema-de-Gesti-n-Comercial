@@ -9,6 +9,33 @@ El principio rector: **es imposible tener stock negativo**, sin importar desde
 dónde se intente (procedimiento, `INSERT` directo, `UPDATE` manual o sesiones
 concurrentes).
 
+## Aplicación de escritorio en red local
+
+Incluye una **aplicación de escritorio en Java (Swing + JDBC)** pensada para
+funcionar con **una computadora como servidor** y otras como clientes:
+
+| Computadora 1 — Servidor | Computadora 2…N — Cliente |
+|---|---|
+| Aplicación Java (interfaz de usuario) | Aplicación Java (interfaz de usuario) |
+| Lógica de negocio | Lógica de negocio |
+| Acceso a datos JDBC → `localhost` | Acceso a datos JDBC → IP del servidor por la LAN |
+| **Motor PostgreSQL con la base única** | Sin motor de base de datos |
+
+![Pantalla de inicio](docs/capturas/inicio.png)
+
+Módulos: **Inicio** (indicadores y alertas), **Usuarios**, **Productos**,
+**Ventas**, **Compras**, **Transferencias**, **Reportes** (kardex valorizado,
+stock, lotes y vencimientos, ventas y márgenes, documentos y anulaciones,
+exportación a CSV/Excel) y **Almacenes**, con inicio de sesión y roles
+(administrador, almacenero, vendedor).
+
+**Guía paso a paso de instalación en red: [docs/INSTALACION_RED.md](docs/INSTALACION_RED.md)**
+(en Windows, un instalador configura PostgreSQL, el firewall y la red).
+
+| Ventas | Reportes |
+|---|---|
+| ![Ventas](docs/capturas/ventas.png) | ![Reportes](docs/capturas/reportes.png) |
+
 ## Inicio rápido
 
 ```bash
@@ -18,7 +45,11 @@ docker compose exec db psql -U inventario -d inventario
 
 # Opción B: PostgreSQL local
 createdb inventario
-./install.sh inventario --demo
+./install.sh inventario --demo --clave-app 'CLAVE_DE_RED'
+
+# Aplicación de escritorio (Java 17+)
+cd aplicacion && mvn package && java -jar target/sistema-gestion.jar
+#   usuario: admin / admin123   (datos demo: jperez y mrojas / demo123)
 
 # Pruebas (crean y eliminan una base temporal)
 tests/run_tests.sh
@@ -193,7 +224,13 @@ Formato de `items` (JSON): ver cabecera de `sql/03_procedimientos.sql`.
   30 transferencias cruzadas simultáneas A→B / B→A (sin interbloqueos ni
   pérdida de valor).
 
-Se ejecutan en GitHub Actions en cada push (`.github/workflows/pruebas.yml`).
+- **`aplicacion/src/test`**: pruebas de integración de la capa JDBC que se
+  conectan con el rol de red, como un cliente de la LAN (login, ventas,
+  sobreventa rechazada, compras con lotes, transferencias, anulaciones y
+  permisos denegados).
+
+Se ejecutan en GitHub Actions en cada push (`.github/workflows/pruebas.yml`),
+que además publica `sistema-gestion.jar` como artefacto descargable.
 
 ## Estructura
 
@@ -203,6 +240,11 @@ sql/02_kardex.sql          trigger del kardex valorizado y protecciones
 sql/03_procedimientos.sql  procedimientos de negocio
 sql/04_alertas.sql         alertas de stock y vencimiento
 sql/05_vistas.sql          vistas, reporte de kardex, auditoría
-sql/06_datos_demo.sql      datos de demostración
+sql/06_usuarios.sql        usuarios (bcrypt), inicio de sesión, vistas de la aplicación
+sql/07_seguridad.sql       rol de red app_inventario y permisos mínimos
+sql/08_datos_demo.sql      datos de demostración
+aplicacion/                aplicación de escritorio Java (Swing + JDBC, Maven)
+instalacion/               instaladores del servidor (Windows / Linux) y lanzador
+docs/                      guía de instalación en red y capturas
 tests/                     pruebas funcionales y de concurrencia
 ```

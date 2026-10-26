@@ -8,8 +8,11 @@ services:
       POSTGRES_USER: inventario
       POSTGRES_PASSWORD: inventario
       POSTGRES_DB: inventario
+      APP_PASSWORD: ${APP_PASSWORD:-inventario}
     ports:
       - "5432:5432"
     volumes:
       - ./sql:/sql:ro
       - ./docker/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+# Las aplicaciones se conectan con usuario "app_inventario" y contraseña APP_PASSWORD
+# (por defecto "inventario"; cámbiela con APP_PASSWORD=... docker compose up -d).

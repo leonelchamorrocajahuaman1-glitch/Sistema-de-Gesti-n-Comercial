@@ -320,6 +320,27 @@ CREATE TRIGGER trg_capa_proteger
     FOR EACH ROW EXECUTE FUNCTION fn_proteger_capa();
 
 -- -----------------------------------------------------------------------------
+--  Producto: el método de valuación y el control de lotes no pueden cambiar
+--  una vez que el producto tiene movimientos (alteraría el kardex histórico).
+-- -----------------------------------------------------------------------------
+CREATE FUNCTION fn_producto_controlar_cambios() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF (NEW.metodo_valuacion, NEW.controla_lote, NEW.controla_vencimiento)
+       IS DISTINCT FROM (OLD.metodo_valuacion, OLD.controla_lote, OLD.controla_vencimiento)
+       AND EXISTS (SELECT 1 FROM kardex WHERE producto_id = OLD.id) THEN
+        RAISE EXCEPTION 'El producto % ya tiene movimientos: no se puede cambiar su método de valuación ni el control de lotes',
+              OLD.codigo USING ERRCODE = 'check_violation';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_producto_controlar
+    BEFORE UPDATE ON producto
+    FOR EACH ROW EXECUTE FUNCTION fn_producto_controlar_cambios();
+
+-- -----------------------------------------------------------------------------
 --  Documentos: solo se permite pasar de PROCESADO a ANULADO
 -- -----------------------------------------------------------------------------
 CREATE FUNCTION fn_documento_controlar_cambios() RETURNS trigger

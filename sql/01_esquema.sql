@@ -55,6 +55,7 @@ CREATE TABLE producto (
     controla_lote            boolean NOT NULL DEFAULT false,
     controla_vencimiento     boolean NOT NULL DEFAULT false,
     dias_alerta_vencimiento  integer NOT NULL DEFAULT 30 CHECK (dias_alerta_vencimiento >= 0),
+    precio_venta             numeric(14,4) NOT NULL DEFAULT 0 CHECK (precio_venta >= 0),
     activo                   boolean NOT NULL DEFAULT true,
     CONSTRAINT ck_producto_vencimiento_requiere_lote
         CHECK (NOT controla_vencimiento OR controla_lote)
@@ -107,7 +108,10 @@ CREATE TABLE documento (
     observacion           text,
     estado                estado_documento NOT NULL DEFAULT 'PROCESADO',
     documento_anulado_id  bigint UNIQUE REFERENCES documento (id),
-    usuario               name             NOT NULL DEFAULT current_user,
+    -- Usuario de la aplicación (fijado por sesión) o, en su defecto, el rol de BD.
+    usuario               varchar(60)      NOT NULL
+                          DEFAULT coalesce(nullif(current_setting('inventario.usuario', true), ''),
+                                           current_user),
     creado_en             timestamptz      NOT NULL DEFAULT clock_timestamp(),
     CONSTRAINT ck_doc_transferencia CHECK (
         (tipo = 'TRANSFERENCIA') = (almacen_destino_id IS NOT NULL)
@@ -136,6 +140,8 @@ CREATE TABLE kardex (
     saldo_costo_unitario  numeric(18,6)   NOT NULL CHECK (saldo_costo_unitario >= 0),
     saldo_valor           numeric(18,4)   NOT NULL CHECK (saldo_valor >= 0),
     permitir_vencido      boolean         NOT NULL DEFAULT false,
+    -- Precio de venta unitario (solo informativo, para márgenes; no afecta el costo).
+    precio_venta          numeric(14,4)   CHECK (precio_venta >= 0),
     kardex_origen_id      bigint REFERENCES kardex (id),
     creado_en             timestamptz     NOT NULL DEFAULT clock_timestamp(),
     CONSTRAINT fk_kardex_lote_producto FOREIGN KEY (lote_id, producto_id)

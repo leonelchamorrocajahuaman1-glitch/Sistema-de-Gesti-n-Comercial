@@ -6,7 +6,8 @@
 --  Los ítems se reciben como JSON:
 --    entradas      [{"producto":"P001","cantidad":10,"costo_unitario":5.5,
 --                    "lote":"L-01","fecha_vencimiento":"2027-01-31"}]
---    salidas       [{"producto":"P001","cantidad":3,"lote":"L-01"}]   (lote opcional)
+--    salidas       [{"producto":"P001","cantidad":3,"lote":"L-01",
+--                    "precio_unitario":9.9}]                 (lote y precio opcionales)
 --    transferencia [{"producto":"P001","cantidad":3,"lote":"L-01"}]   (lote opcional)
 --    inv. físico   [{"producto":"P001","cantidad_fisica":7,"lote":"L-01",
 --                    "costo_unitario":5.5}]                           (costo opcional)
@@ -177,17 +178,22 @@ BEGIN
     RETURNING id INTO p_documento_id;
 
     FOR v_item IN
-        SELECT * FROM jsonb_to_recordset(p_items) AS x(producto text, cantidad numeric, lote text)
+        SELECT * FROM jsonb_to_recordset(p_items)
+                 AS x(producto text, cantidad numeric, lote text, precio_unitario numeric)
     LOOP
         v_producto_id := fn_producto_id(v_item.producto);
 
         -- Solo las mermas y ajustes negativos pueden retirar lotes vencidos;
         -- nunca se vende ni transfiere mercadería vencida.
         INSERT INTO kardex (documento_id, fecha, almacen_id, producto_id, lote_id,
-                            tipo_movimiento, cantidad, permitir_vencido)
+                            tipo_movimiento, cantidad, permitir_vencido, precio_venta)
         VALUES (p_documento_id, p_fecha, p_almacen_id, v_producto_id,
                 fn_obtener_lote(v_producto_id, v_item.lote, NULL, false),
-                'SALIDA', v_item.cantidad, p_tipo IN ('MERMA', 'AJUSTE_NEGATIVO'));
+                'SALIDA', v_item.cantidad, p_tipo IN ('MERMA', 'AJUSTE_NEGATIVO'),
+                CASE WHEN p_tipo = 'VENTA'
+                     THEN coalesce(v_item.precio_unitario,
+                                   (SELECT precio_venta FROM producto WHERE id = v_producto_id))
+                END);
     END LOOP;
 END;
 $$;

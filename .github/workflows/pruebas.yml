@@ -1,4 +1,4 @@
-name: Pruebas de base de datos
+name: Pruebas y compilación
 
 on:
   push:
@@ -25,5 +25,32 @@ jobs:
       PGDATABASE: postgres
     steps:
       - uses: actions/checkout@v4
-      - name: Ejecutar pruebas funcionales y de concurrencia
+
+      - name: Pruebas de base de datos (funcionales y de concurrencia)
         run: tests/run_tests.sh
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Base para las pruebas de la aplicación
+        run: |
+          createdb inventario_ci
+          ./install.sh inventario_ci --demo --clave-app clave_ci
+
+      - name: Compilar la aplicación y ejecutar pruebas de integración (JDBC como cliente)
+        working-directory: aplicacion
+        env:
+          INV_DB: inventario_ci
+          INV_CLAVE: clave_ci
+        run: mvn -B verify -Dtest='*' -Dsurefire.failIfNoSpecifiedTests=false
+
+      - name: Publicar el ejecutable
+        uses: actions/upload-artifact@v4
+        with:
+          name: sistema-gestion
+          path: |
+            aplicacion/target/sistema-gestion.jar
+            instalacion/windows/EJECUTAR_SISTEMA.bat
