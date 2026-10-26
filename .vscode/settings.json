@@ -1,0 +1,5 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "files.encoding": "utf8",
+  "files.associations": { "*.sql": "sql" }
+}

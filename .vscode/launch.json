@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Abrir Sistema de Gestión",
+      "request": "launch",
+      "mainClass": "pe.sistema.inventario.App",
+      "projectName": "sistema-gestion",
+      "cwd": "${workspaceFolder}/aplicacion"
+    }
+  ]
+}

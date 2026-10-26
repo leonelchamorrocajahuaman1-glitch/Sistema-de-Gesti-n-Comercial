@@ -46,6 +46,17 @@ El instalador hace el resto (instala Java si falta, crea la base de datos, confi
 firewall, crea el icono del escritorio) y abre el sistema. Usuario `admin`, contraseña `admin123`.
 Para otras computadoras de la red copie la carpeta `PARA_COMPUTADORAS_CLIENTE` que se genera.
 
+## Abrir en Visual Studio Code
+
+1. Instale **PostgreSQL** y **Java 17+** (https://adoptium.net).
+2. En VS Code: **Archivo → Abrir carpeta…** y elija la carpeta del proyecto.
+   Acepte instalar las **extensiones recomendadas** (Java y Claude Code).
+3. **Terminal → Ejecutar tarea… → `1. Instalar base de datos (Windows)`** y escriba la
+   contraseña de `postgres` en la ventana que se abre.
+4. Pulse **F5** (*Abrir Sistema de Gestión*). Usuario `admin`, contraseña `admin123`.
+
+No hace falta instalar Maven: el proyecto incluye `mvnw` (tarea `2. Compilar programa`).
+
 ## Inicio rápido (desarrolladores)
 
 ```bash

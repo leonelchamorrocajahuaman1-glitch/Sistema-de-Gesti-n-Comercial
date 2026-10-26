@@ -66,7 +66,9 @@ trap {
     exit 1
 }
 $sqlDir = Join-Path $raiz "sql"
-$jar = Join-Path $raiz "sistema-gestion.jar"
+# Paquete de descarga: el .jar está en la raíz; repositorio: aplicacion\target tras compilar.
+$jar = @((Join-Path $raiz "sistema-gestion.jar"), (Join-Path $raiz "aplicacion\target\sistema-gestion.jar")) |
+       Where-Object { Test-Path $_ } | Select-Object -First 1
 
 # ---------------------------------------------------------------- Java
 Paso "Verificando Java"
@@ -160,7 +162,11 @@ $env:CLAVE_APP = $clave
 if ($LASTEXITCODE -ne 0) { throw "No se pudo asignar la contraseña de red." }
 Remove-Item Env:CLAVE_APP
 EscribirPropiedades $configServidor "localhost" $clave
-Write-Host "Configuración guardada en $configServidor"
+# También en el perfil del usuario: así funciona al ejecutar desde Visual Studio Code.
+$configUsuario = Join-Path $env:USERPROFILE ".sistema-gestion\conexion.properties"
+New-Item -ItemType Directory -Force (Split-Path $configUsuario) | Out-Null
+EscribirPropiedades $configUsuario "localhost" $clave
+Write-Host "Configuración guardada en $configServidor y $configUsuario"
 
 # ---------------------------------------------------------------- red local
 Paso "Habilitando conexiones desde la red local"
@@ -214,15 +220,20 @@ if ($ips.Count -gt 0) {
 
 # ---------------------------------------------------------------- aplicación
 Paso "Instalando la aplicación"
-if (-not (Test-Path $jar)) {
-    throw "No se encontró sistema-gestion.jar en $raiz. Use el paquete SistemaGestion-Windows.zip."
+if (-not $jar) {
+    Write-Host "`nLa base de datos quedó instalada." -ForegroundColor Green
+    Write-Host "Falta compilar el programa: en Visual Studio Code use Terminal > Ejecutar tarea >"
+    Write-Host "'Compilar programa', o ejecute F5 para abrirlo directamente."
+    try { Stop-Transcript | Out-Null } catch { }
+    exit 0
 }
+$jarDir = Split-Path $jar
 $escritorio = [Environment]::GetFolderPath("CommonDesktopDirectory")
 $ws = New-Object -ComObject WScript.Shell
 $acceso = $ws.CreateShortcut((Join-Path $escritorio "Sistema de Gestión.lnk"))
 $acceso.TargetPath = $javaw
 $acceso.Arguments = "-jar `"$jar`""
-$acceso.WorkingDirectory = $raiz
+$acceso.WorkingDirectory = $jarDir
 $acceso.IconLocation = "$javaw,0"
 $acceso.Save()
 Write-Host "Acceso directo creado en el escritorio: 'Sistema de Gestión'"
@@ -231,7 +242,8 @@ if ($ips.Count -gt 0) {
     $clientes = Join-Path $raiz "PARA_COMPUTADORAS_CLIENTE"
     New-Item -ItemType Directory -Force $clientes | Out-Null
     Copy-Item $jar $clientes -Force
-    Copy-Item (Join-Path $raiz "EJECUTAR_SISTEMA.bat") $clientes -Force -ErrorAction SilentlyContinue
+    @((Join-Path $raiz "EJECUTAR_SISTEMA.bat"), (Join-Path $raiz "instalacion\windows\EJECUTAR_SISTEMA.bat")) |
+        Where-Object { Test-Path $_ } | Select-Object -First 1 | ForEach-Object { Copy-Item $_ $clientes -Force }
     EscribirPropiedades (Join-Path $clientes "conexion.properties") $ips[0].IPAddress $clave
 }
 
@@ -248,5 +260,5 @@ if ($ips.Count -gt 0) {
     Write-Host "   2. En la otra PC haga doble clic en EJECUTAR_SISTEMA.bat (necesita Java)."
     Write-Host "   IP de este servidor: $($ips[0].IPAddress)  (fíjela en el router para que no cambie)" -ForegroundColor Yellow
 }
-Start-Process -FilePath $javaw -ArgumentList "-jar `"$jar`"" -WorkingDirectory $raiz
+Start-Process -FilePath $javaw -ArgumentList "-jar `"$jar`"" -WorkingDirectory $jarDir
 try { Stop-Transcript | Out-Null } catch { }

@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "1. Instalar base de datos (Windows)",
+      "detail": "Crea la base de datos en PostgreSQL. Pide la contraseña de 'postgres'.",
+      "type": "process",
+      "command": "cmd.exe",
+      "args": ["/c", "${workspaceFolder}\\instalacion\\windows\\INSTALAR.bat"],
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "2. Compilar programa",
+      "detail": "Genera aplicacion/target/sistema-gestion.jar (no requiere Maven instalado).",
+      "type": "shell",
+      "command": "./mvnw -B package -DskipTests",
+      "windows": { "command": ".\\mvnw.cmd -B package -DskipTests" },
+      "options": { "cwd": "${workspaceFolder}/aplicacion" },
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "3. Abrir el programa",
+      "detail": "Ejecuta el .jar compilado.",
+      "type": "shell",
+      "command": "java -jar target/sistema-gestion.jar",
+      "options": { "cwd": "${workspaceFolder}/aplicacion" },
+      "dependsOn": "2. Compilar programa",
+      "problemMatcher": []
+    }
+  ]
+}
