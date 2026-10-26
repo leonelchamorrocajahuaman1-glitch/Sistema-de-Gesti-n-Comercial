@@ -65,8 +65,8 @@ final class PanelReportes extends JPanel implements VentanaPrincipal.Seccion {
         desde.setText(Ui.formato(hoy.withDayOfMonth(1)));
         hasta.setText(Ui.formato(hoy));
 
-        almacen.setPrototypeDisplayValue(new Opcion(null, "XXXXXXXXXXXXXXXXXXXXXXXXXX"));
-        producto.setPrototypeDisplayValue(new Opcion(null, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+        almacen.setPrototypeDisplayValue(new Opcion(null, "XXXXXXXXXXXXXXXXXXXXX"));
+        producto.setPrototypeDisplayValue(new Opcion(null, "XXXXXXXXXXXXXXXXXXXXXXX"));
         JPanel fila1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         fila1.add(new JLabel("Reporte:"));
         fila1.add(reporte);

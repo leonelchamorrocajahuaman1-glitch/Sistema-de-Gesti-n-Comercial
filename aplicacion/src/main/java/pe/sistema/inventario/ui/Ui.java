@@ -189,13 +189,20 @@ public final class Ui {
     /** Ajusta el ancho de cada columna a su contenido (muestra de hasta 200 filas). */
     static void ajustarColumnas(JTable t) {
         java.awt.FontMetrics fm = t.getFontMetrics(t.getFont());
+        int total = 0;
         for (int c = 0; c < t.getColumnCount(); c++) {
             int ancho = fm.stringWidth(t.getColumnName(c)) + 24;
             for (int f = 0; f < Math.min(t.getRowCount(), 200); f++) {
                 ancho = Math.max(ancho, fm.stringWidth(formato(t.getValueAt(f, c))) + 16);
             }
-            t.getColumnModel().getColumn(c).setPreferredWidth(Math.min(ancho, 420));
+            ancho = Math.min(ancho, 420);
+            t.getColumnModel().getColumn(c).setPreferredWidth(ancho);
+            total += ancho;
         }
+        // Si las columnas no caben se habilita el desplazamiento horizontal en vez de recortarlas.
+        int visible = t.getParent() == null ? 0 : t.getParent().getWidth();
+        t.setAutoResizeMode(visible > 0 && total > visible ? JTable.AUTO_RESIZE_OFF
+                                                           : JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
     }
 
     public static JTable tabla(javax.swing.table.TableModel modelo) {
