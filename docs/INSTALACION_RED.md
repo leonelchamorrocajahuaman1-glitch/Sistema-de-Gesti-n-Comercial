@@ -29,6 +29,16 @@ flowchart LR
 | `sistema-gestion.jar` y `EJECUTAR_SISTEMA.bat` | ✔ | ✔ |
 | Misma red local (cable o Wi-Fi del mismo router) | ✔ | ✔ |
 
+## Forma rápida (recomendada)
+
+1. Instale PostgreSQL en el servidor.
+2. Descargue y descomprima [`descargas/SistemaGestion-Windows.zip`](../descargas/SistemaGestion-Windows.zip).
+3. Doble clic en `INSTALAR.bat` → escriba la contraseña de `postgres`.
+4. En cada cliente: instale Java, copie la carpeta `PARA_COMPUTADORAS_CLIENTE` y abra `EJECUTAR_SISTEMA.bat`
+   (ya trae la IP del servidor y la contraseña de red configuradas).
+
+Las secciones siguientes describen la instalación manual paso a paso.
+
 ## 1. Obtener el programa
 
 Descargue el artefacto **sistema-gestion** de la última ejecución de GitHub
@@ -42,22 +52,25 @@ mvn package          # genera aplicacion/target/sistema-gestion.jar
 ## 2. Preparar la computadora SERVIDOR (Windows)
 
 1. Instale PostgreSQL (anote la contraseña del usuario `postgres`) y Java.
-2. Copie la carpeta completa del proyecto al servidor.
-3. Clic derecho en `instalacion\windows\INSTALAR_SERVIDOR.bat` → **Ejecutar como administrador**.
+2. Copie la carpeta completa del proyecto al servidor y coloque `sistema-gestion.jar`
+   en la raíz de esa carpeta (junto a `sql\`).
+3. Doble clic en `INSTALAR.bat` (en el repositorio: `instalacion\windows\INSTALAR.bat`).
    El instalador:
    - crea la base `inventario` con tablas, triggers y procedimientos;
-   - le pide una **contraseña de red** para el usuario `app_inventario`, que es
-     el que usan las aplicaciones (no tiene permisos para alterar el kardex);
+   - genera una **contraseña de red** aleatoria para el usuario `app_inventario`
+     (el que usan las aplicaciones; no puede alterar el kardex) y la guarda en
+     `conexion.properties` junto al `.jar`;
    - configura PostgreSQL para escuchar en la red (`listen_addresses`) y
      autoriza solo a su subred en `pg_hba.conf` (deja copias `.respaldo`);
    - abre el puerto 5432 en el Firewall de Windows **solo para la subred local**;
-   - muestra la **IP del servidor** que debe anotar.
+   - crea el icono del escritorio y la carpeta `PARA_COMPUTADORAS_CLIENTE`
+     (con la IP del servidor ya configurada) y muestra la **IP del servidor**.
 
-   Para cargar datos de ejemplo: `INSTALAR_SERVIDOR.bat -Demo`.
+   El instalador pregunta si desea cargar datos de ejemplo.
 4. Recomendado: reserve una **IP fija** para el servidor en su router; si la IP
    cambia, los clientes dejarán de encontrarlo.
-5. Ejecute `EJECUTAR_SISTEMA.bat` (junto al `.jar`). En *Configuración de
-   conexión* use:
+5. El sistema se abre solo con la conexión ya configurada. Si alguna vez debe
+   configurarla a mano (botón *Configurar conexión...*), use:
 
    | Campo | Valor |
    |---|---|
@@ -65,7 +78,7 @@ mvn package          # genera aplicacion/target/sistema-gestion.jar
    | Puerto | `5432` |
    | Base de datos | `inventario` |
    | Usuario de red | `app_inventario` |
-   | Contraseña de red | la definida en el paso 3 |
+   | Contraseña de red | la que figura en `conexion.properties` |
 
 6. Inicie sesión con **admin / admin123**; el sistema le pedirá cambiarla.
    Cree los usuarios de los demás trabajadores en **Usuarios**.

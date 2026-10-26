@@ -47,10 +47,11 @@ jobs:
           INV_CLAVE: clave_ci
         run: mvn -B verify -Dtest='*' -Dsurefire.failIfNoSpecifiedTests=false
 
-      - name: Publicar el ejecutable
+      - name: Armar el paquete de instalación para Windows
+        run: instalacion/empaquetar.sh
+
+      - name: Publicar el paquete
         uses: actions/upload-artifact@v4
         with:
-          name: sistema-gestion
-          path: |
-            aplicacion/target/sistema-gestion.jar
-            instalacion/windows/EJECUTAR_SISTEMA.bat
+          name: SistemaGestion-Windows
+          path: dist/SistemaGestion-Windows.zip

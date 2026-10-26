@@ -36,7 +36,17 @@ exportación a CSV/Excel) y **Almacenes**, con inicio de sesión y roles
 |---|---|
 | ![Ventas](docs/capturas/ventas.png) | ![Reportes](docs/capturas/reportes.png) |
 
-## Inicio rápido
+## Instalación rápida en Windows (sin programar)
+
+1. Instale **PostgreSQL** desde https://www.postgresql.org/download/windows/ (anote la contraseña de `postgres`).
+2. Descargue **[SistemaGestion-Windows.zip](descargas/SistemaGestion-Windows.zip)** y descomprímalo.
+3. Doble clic en **`INSTALAR.bat`** y escriba la contraseña de `postgres`.
+
+El instalador hace el resto (instala Java si falta, crea la base de datos, configura la red y el
+firewall, crea el icono del escritorio) y abre el sistema. Usuario `admin`, contraseña `admin123`.
+Para otras computadoras de la red copie la carpeta `PARA_COMPUTADORAS_CLIENTE` que se genera.
+
+## Inicio rápido (desarrolladores)
 
 ```bash
 # Opción A: Docker (PostgreSQL 16 + datos de demostración)
