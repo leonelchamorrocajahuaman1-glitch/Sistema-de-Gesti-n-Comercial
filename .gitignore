@@ -1,3 +1,6 @@
 *.log
 .env
 dist/
+# Generados por el instalador de Windows: contienen la contraseña de red
+conexion.properties
+PARA_COMPUTADORAS_CLIENTE/
