@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Piezas comunes de todas las páginas: cabecera, menú, mensajes y scripts. -->
+
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title th:text="${titulo} + ' · Sistema de Gestión'">Sistema de Gestión</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.min.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+
+<body>
+
+<nav th:fragment="menu" class="navbar navbar-expand-lg navbar-dark barra mb-3">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-semibold" th:href="@{/}"><i class="bi bi-box-seam me-1"></i> Sistema de Gestión</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+                aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menú">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuPrincipal">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" th:classappend="${ruta == '/'} ? active" th:href="@{/}">
+                    <i class="bi bi-speedometer2"></i> Inicio</a></li>
+                <li class="nav-item" th:if="${u.esAdministrador()}"><a class="nav-link"
+                    th:classappend="${#strings.startsWith(ruta, '/usuarios')} ? active" th:href="@{/usuarios}">
+                    <i class="bi bi-people"></i> Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link"
+                    th:classappend="${#strings.startsWith(ruta, '/productos')} ? active" th:href="@{/productos}">
+                    <i class="bi bi-tags"></i> Productos</a></li>
+                <li class="nav-item"><a class="nav-link"
+                    th:classappend="${#strings.startsWith(ruta, '/ventas')} ? active" th:href="@{/ventas}">
+                    <i class="bi bi-cart3"></i> Ventas</a></li>
+                <li class="nav-item" th:if="${u.gestionaAlmacen()}"><a class="nav-link"
+                    th:classappend="${#strings.startsWith(ruta, '/compras')} ? active" th:href="@{/compras}">
+                    <i class="bi bi-truck"></i> Compras</a></li>
+                <li class="nav-item" th:if="${u.gestionaAlmacen()}"><a class="nav-link"
+                    th:classappend="${#strings.startsWith(ruta, '/transferencias')} ? active"
+                    th:href="@{/transferencias}"><i class="bi bi-arrow-left-right"></i> Transferencias</a></li>
+                <li class="nav-item"><a class="nav-link"
+                    th:classappend="${#strings.startsWith(ruta, '/reportes')} ? active" th:href="@{/reportes}">
+                    <i class="bi bi-bar-chart-line"></i> Reportes</a></li>
+                <li class="nav-item" th:if="${u.esAdministrador()}"><a class="nav-link"
+                    th:classappend="${#strings.startsWith(ruta, '/almacenes')} ? active" th:href="@{/almacenes}">
+                    <i class="bi bi-building"></i> Almacenes</a></li>
+            </ul>
+            <div class="dropdown">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="bi bi-person-circle"></i> <span th:text="${u.nombre}">Usuario</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><span class="dropdown-item-text small text-secondary"
+                              th:text="${u.usuario} + ' · ' + ${@fmt.tipo(u.rol)}">rol</span></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" th:href="@{/cambiar-clave}"><i class="bi bi-key"></i> Cambiar contraseña</a></li>
+                    <li>
+                        <form th:action="@{/salir}" method="post">
+                            <button class="dropdown-item" type="submit"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div th:fragment="mensajes">
+    <div class="alert alert-success alert-dismissible fade show" role="status" th:if="${ok}">
+        <i class="bi bi-check-circle"></i> <span th:text="${ok}">Correcto</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    <div class="alert alert-danger" role="alert" th:if="${error}">
+        <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}">Error</span>
+    </div>
+    <div class="alert alert-info" role="status" th:if="${aviso}">
+        <i class="bi bi-info-circle"></i> <span th:text="${aviso}">Aviso</span>
+    </div>
+</div>
+
+<th:block th:fragment="scripts">
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/app.js}"></script>
+</th:block>
+
+</body>
+</html>

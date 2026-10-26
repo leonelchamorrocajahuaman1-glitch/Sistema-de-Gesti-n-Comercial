@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head('Usuarios')}"></head>
+<body>
+<nav th:replace="~{fragmentos/base :: menu}"></nav>
+<main class="container-fluid px-3 px-lg-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h1 class="h3 titulo mb-0">Usuarios</h1>
+        <a class="btn btn-primary btn-sm" th:href="@{/usuarios/nuevo}"><i class="bi bi-person-plus"></i> Nuevo usuario</a>
+    </div>
+    <div th:replace="~{fragmentos/base :: mensajes}"></div>
+    <div class="table-responsive tabla-datos">
+        <table class="table table-sm table-striped table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr><th>Usuario</th><th>Nombre completo</th><th>Rol</th><th>Almacén</th><th>Activo</th>
+                <th>Debe cambiar contraseña</th><th>Último acceso</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="f : ${usuarios.filas}" th:classappend="${!f[5]} ? 'text-secondary'">
+                <td class="fw-semibold" th:text="${f[1]}">usuario</td>
+                <td th:text="${f[2]}">Nombre</td>
+                <td th:text="${@fmt.tipo(f[3])}">Rol</td>
+                <td th:text="${f[4] ?: '(todos)'}">ALM</td>
+                <td th:text="${@fmt.valor(f[5])}">Sí</td>
+                <td th:text="${@fmt.valor(f[6])}">No</td>
+                <td class="text-nowrap" th:text="${@fmt.valor(f[7])}">fecha</td>
+                <td class="text-end"><a class="btn btn-outline-primary btn-sm" th:href="@{/usuarios/editar(id=${f[0]})}">
+                    <i class="bi bi-pencil"></i> Editar</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<th:block th:replace="~{fragmentos/base :: scripts}"></th:block>
+</body>
+</html>

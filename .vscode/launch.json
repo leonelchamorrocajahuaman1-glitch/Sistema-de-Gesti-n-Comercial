@@ -3,7 +3,15 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Abrir Sistema de Gestión",
+      "name": "Sistema web (http://localhost:8080)",
+      "request": "launch",
+      "mainClass": "pe.sistema.web.SistemaWebApplication",
+      "projectName": "sistema-web",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "Abrir Sistema de Gestión (escritorio)",
       "request": "launch",
       "mainClass": "pe.sistema.inventario.App",
       "projectName": "sistema-gestion",

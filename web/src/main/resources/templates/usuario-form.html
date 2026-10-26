@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head(${f.id == null} ? 'Nuevo usuario' : 'Editar usuario')}"></head>
+<body>
+<nav th:replace="~{fragmentos/base :: menu}"></nav>
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <h1 class="h3 titulo" th:text="${f.id == null} ? 'Nuevo usuario' : 'Editar usuario'">Usuario</h1>
+            <div th:replace="~{fragmentos/base :: mensajes}"></div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form th:action="@{/usuarios/guardar}" method="post" data-un-envio autocomplete="off">
+                        <input type="hidden" name="id" th:value="${f.id}">
+                        <div class="mb-3">
+                            <label for="usuario" class="form-label">Usuario</label>
+                            <input class="form-control" id="usuario" name="usuario" maxlength="30" required
+                                   pattern="[a-zA-Z0-9._\-]{3,30}" autocapitalize="none" spellcheck="false"
+                                   th:value="${f.usuario}" aria-describedby="ayudaUsuario">
+                            <div id="ayudaUsuario" class="form-text">3 a 30 caracteres: letras, números, punto o guion.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre completo</label>
+                            <input class="form-control" id="nombre" name="nombre" maxlength="100" required th:value="${f.nombre}">
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label for="rol" class="form-label">Rol</label>
+                                <select class="form-select" id="rol" name="rol">
+                                    <option th:each="r : ${roles}" th:value="${r}" th:text="${@fmt.tipo(r)}"
+                                            th:selected="${r == f.rol}">Rol</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="almacen" class="form-label">Almacén por defecto</label>
+                                <select class="form-select" id="almacen" name="almacen">
+                                    <option value="">(todos)</option>
+                                    <option th:each="a : ${almacenes}" th:value="${a.id}" th:text="${a.texto}"
+                                            th:selected="${a.idEntero() == f.almacen}">Almacén</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="activo" name="activo" value="true" th:checked="${f.activo}">
+                            <label class="form-check-label" for="activo">Activo</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clave" class="form-label"
+                                   th:text="${f.id == null} ? 'Contraseña inicial' : 'Restablecer contraseña (opcional)'">Contraseña</label>
+                            <input class="form-control" type="password" id="clave" name="clave" minlength="6"
+                                   autocomplete="new-password" th:required="${f.id == null}" aria-describedby="ayudaClave">
+                            <div id="ayudaClave" class="form-text">
+                                Mínimo 6 caracteres. El usuario deberá cambiarla en su próximo ingreso.
+                                <th:block th:if="${f.id != null}">Déjela vacía para no cambiarla.</th:block>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a class="btn btn-outline-secondary" th:href="@{/usuarios}">Cancelar</a>
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg"></i> Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragmentos/base :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head('Inicio')}"></head>
+<body>
+<nav th:replace="~{fragmentos/base :: menu}"></nav>
+<main class="container-fluid px-3 px-lg-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h1 class="h3 titulo mb-0">Inicio</h1>
+        <a class="btn btn-outline-secondary btn-sm" th:href="@{/}"><i class="bi bi-arrow-clockwise"></i> Actualizar</a>
+    </div>
+    <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-lg-3">
+            <div class="card kpi kpi-azul h-100"><div class="card-body">
+                <div class="kpi-titulo">Valor del inventario (S/)</div>
+                <div class="kpi-valor" th:text="${@fmt.dinero(indicadores[0])}">0.00</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card kpi kpi-verde h-100"><div class="card-body">
+                <div class="kpi-titulo">Productos con stock</div>
+                <div class="kpi-valor" th:text="${indicadores[1]}">0</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a class="card kpi kpi-rojo h-100 text-decoration-none" th:href="@{/reportes(tipo='ALERTAS')}"><div class="card-body">
+                <div class="kpi-titulo">Alertas activas</div>
+                <div class="kpi-valor" th:text="${indicadores[2]}">0</div>
+            </div></a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card kpi kpi-ambar h-100"><div class="card-body">
+                <div class="kpi-titulo">Ventas de hoy (S/)</div>
+                <div class="kpi-valor" th:text="${@fmt.dinero(indicadores[3])}">0.00</div>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <section class="col-12 col-xl-7">
+            <h2 class="h5">Alertas activas</h2>
+            <div th:replace="~{fragmentos/tabla :: tabla(${alertas}, false)}"></div>
+        </section>
+        <section class="col-12 col-xl-5">
+            <h2 class="h5">Inventario por almacén</h2>
+            <div th:replace="~{fragmentos/tabla :: tabla(${almacenes}, false)}"></div>
+        </section>
+    </div>
+</main>
+<th:block th:replace="~{fragmentos/base :: scripts}"></th:block>
+</body>
+</html>

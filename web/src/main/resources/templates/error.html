@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head('Aviso')}"></head>
+<body class="fondo-login">
+<main class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 text-center" th:switch="${status}">
+                    <i class="bi bi-exclamation-octagon display-5 text-danger"></i>
+                    <th:block th:case="403">
+                        <h1 class="h4 mt-2">No tiene permiso para esta sección</h1>
+                        <p class="text-secondary">Su rol no permite usar esta opción. Consulte al administrador.</p>
+                    </th:block>
+                    <th:block th:case="404">
+                        <h1 class="h4 mt-2">Página no encontrada</h1>
+                        <p class="text-secondary">La dirección no existe. Use el menú para navegar.</p>
+                    </th:block>
+                    <th:block th:case="400">
+                        <h1 class="h4 mt-2">Datos no válidos</h1>
+                        <p class="text-secondary">Revise lo que escribió e inténtelo de nuevo.</p>
+                    </th:block>
+                    <th:block th:case="*">
+                        <h1 class="h4 mt-2">Ocurrió un problema</h1>
+                        <p class="text-secondary" th:text="${mensaje} ?: 'Inténtelo de nuevo. Si persiste, revise el archivo logs/sistema-web.log del servidor.'">
+                            Mensaje</p>
+                    </th:block>
+                    <a class="btn btn-primary" th:href="@{/}"><i class="bi bi-house"></i> Volver al inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head('Productos')}"></head>
+<body>
+<nav th:replace="~{fragmentos/base :: menu}"></nav>
+<main class="container-fluid px-3 px-lg-4">
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-2">
+        <h1 class="h3 titulo mb-0">Productos</h1>
+        <div class="d-flex flex-wrap gap-2">
+            <form class="d-flex gap-2" th:action="@{/productos}" method="get" role="search">
+                <input class="form-control form-control-sm" type="search" name="q" th:value="${q}"
+                       placeholder="Código, nombre o categoría" aria-label="Buscar producto">
+                <button class="btn btn-outline-secondary btn-sm" type="submit"><i class="bi bi-search"></i> Buscar</button>
+            </form>
+            <a th:if="${u.gestionaAlmacen()}" class="btn btn-primary btn-sm" th:href="@{/productos/nuevo}">
+                <i class="bi bi-plus-lg"></i> Nuevo producto</a>
+        </div>
+    </div>
+    <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+    <div class="table-responsive tabla-datos">
+        <table class="table table-sm table-striped table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+                <th>Código</th><th>Nombre</th><th>Categoría</th><th>Unidad</th><th>Valuación</th>
+                <th>Lotes</th><th>Vence</th><th class="text-end">Precio venta</th><th class="text-end">Stock total</th>
+                <th class="text-end">Valor total</th><th>Activo</th>
+                <th th:if="${u.gestionaAlmacen()}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="f : ${productos.filas}" th:classappend="${!f[10]} ? 'text-secondary'">
+                <td class="text-nowrap fw-semibold" th:text="${f[0]}">COD</td>
+                <td th:text="${f[1]}">Nombre</td>
+                <td th:text="${f[2]}">Cat</td>
+                <td th:text="${f[3]}">UND</td>
+                <td th:text="${f[4]}">PROMEDIO</td>
+                <td th:text="${@fmt.valor(f[5])}">No</td>
+                <td th:text="${@fmt.valor(f[6])}">No</td>
+                <td class="text-end text-nowrap" th:text="${@fmt.valor(f[7])}">0</td>
+                <td class="text-end text-nowrap" th:text="${@fmt.valor(f[8])}">0</td>
+                <td class="text-end text-nowrap" th:text="${@fmt.valor(f[9])}">0</td>
+                <td th:text="${@fmt.valor(f[10])}">Sí</td>
+                <td th:if="${u.gestionaAlmacen()}" class="text-end text-nowrap">
+                    <a class="btn btn-outline-primary btn-sm" th:href="@{/productos/editar(codigo=${f[0]})}"
+                       title="Editar producto"><i class="bi bi-pencil"></i> Editar</a>
+                    <a class="btn btn-outline-secondary btn-sm" th:href="@{/productos/stock-minimo(codigo=${f[0]})}"
+                       title="Stock mínimo por almacén"><i class="bi bi-bell"></i> Mínimo</a>
+                </td>
+            </tr>
+            <tr th:if="${productos.filas.isEmpty()}">
+                <td colspan="12" class="text-center text-secondary py-4">No se encontraron productos.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<th:block th:replace="~{fragmentos/base :: scripts}"></th:block>
+</body>
+</html>

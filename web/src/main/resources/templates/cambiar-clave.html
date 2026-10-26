@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head('Cambiar contraseña')}"></head>
+<body>
+<th:block th:if="${!u.debeCambiarClave}"><nav th:replace="~{fragmentos/base :: menu}"></nav></th:block>
+<nav th:if="${u.debeCambiarClave}" class="navbar navbar-dark barra mb-3">
+    <div class="container-fluid">
+        <span class="navbar-brand fw-semibold"><i class="bi bi-box-seam me-1"></i> Sistema de Gestión</span>
+        <form th:action="@{/salir}" method="post">
+            <button class="btn btn-outline-light btn-sm" type="submit"><i class="bi bi-box-arrow-right"></i> Salir</button>
+        </form>
+    </div>
+</nav>
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-7 col-lg-5">
+            <h1 class="h3 titulo">Cambiar contraseña</h1>
+            <div class="alert alert-warning" th:if="${u.debeCambiarClave}">
+                <i class="bi bi-shield-lock"></i>
+                Por seguridad, <strong th:text="${u.nombre}">usuario</strong>, debe cambiar su contraseña inicial
+                antes de continuar.
+            </div>
+            <div th:replace="~{fragmentos/base :: mensajes}"></div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form th:action="@{/cambiar-clave}" method="post" data-un-envio>
+                        <input type="text" name="usuario" th:value="${u.usuario}" autocomplete="username" hidden>
+                        <div class="mb-3">
+                            <label for="actual" class="form-label">Contraseña actual</label>
+                            <input type="password" class="form-control" id="actual" name="actual"
+                                   autocomplete="current-password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nueva" class="form-label">Nueva contraseña</label>
+                            <input type="password" class="form-control" id="nueva" name="nueva" minlength="6"
+                                   autocomplete="new-password" required aria-describedby="ayudaNueva">
+                            <div id="ayudaNueva" class="form-text">Mínimo 6 caracteres y distinta de la actual.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmar" class="form-label">Repita la nueva contraseña</label>
+                            <input type="password" class="form-control" id="confirmar" name="confirmar" minlength="6"
+                                   autocomplete="new-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check-lg"></i> Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragmentos/base :: scripts}"></th:block>
+</body>
+</html>

@@ -9,6 +9,27 @@ El principio rector: **es imposible tener stock negativo**, sin importar desde
 dónde se intente (procedimiento, `INSERT` directo, `UPDATE` manual o sesiones
 concurrentes).
 
+## Versión web (recomendada para la red local)
+
+La PC servidor ejecuta PostgreSQL y la página web; **las demás PC y los celulares
+solo abren el navegador** en `http://IP-DEL-SERVIDOR:8080` (por ejemplo
+`http://192.168.1.84:8080`), sin instalar Java ni nada.
+
+| Inicio | Compras | Celular |
+|---|---|---|
+| ![Inicio web](docs/capturas/web-inicio.jpg) | ![Compras web](docs/capturas/web-compras.jpg) | ![Celular](docs/capturas/web-celular.jpg) |
+
+- **Instalar en el servidor:** clic derecho sobre `instalacion\windows\INSTALAR_WEB.bat` →
+  *Ejecutar como administrador* (requiere la base ya instalada con `INSTALAR.bat`).
+  Queda arrancando solo al encender la PC, con el puerto 8080 abierto solo para la red local
+  y un icono en el escritorio.
+- **Guía paso a paso: [docs/VERSION_WEB.md](docs/VERSION_WEB.md)**
+- Tecnología: Java 21 + Spring Boot 3 + Thymeleaf + Bootstrap 5 (incluido en el .jar,
+  funciona sin internet), un solo archivo `web/target/sistema-web.jar`. Reutiliza la
+  base de datos completa: procedimientos, kardex, alertas, vistas y usuarios con bcrypt.
+- Seguridad: inicio de sesión con roles y cambio obligatorio de la contraseña inicial,
+  cierre por 30 minutos de inactividad, CSRF, permisos por rol validados en el servidor.
+
 ## Aplicación de escritorio en red local
 
 Incluye una **aplicación de escritorio en Java (Swing + JDBC)** pensada para
@@ -264,8 +285,9 @@ sql/05_vistas.sql          vistas, reporte de kardex, auditoría
 sql/06_usuarios.sql        usuarios (bcrypt), inicio de sesión, vistas de la aplicación
 sql/07_seguridad.sql       rol de red app_inventario y permisos mínimos
 sql/08_datos_demo.sql      datos de demostración
+web/                       versión web (Spring Boot 3 + Thymeleaf + Bootstrap, Maven)
 aplicacion/                aplicación de escritorio Java (Swing + JDBC, Maven)
-instalacion/               instaladores del servidor (Windows / Linux) y lanzador
-docs/                      guía de instalación en red y capturas
+instalacion/               instaladores del servidor (Windows / Linux), instalador web y lanzador
+docs/                      guías (VERSION_WEB.md, INSTALACION_RED.md) y capturas
 tests/                     pruebas funcionales y de concurrencia
 ```

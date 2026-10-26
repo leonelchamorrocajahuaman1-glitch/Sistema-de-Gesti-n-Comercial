@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
           cache: maven
 
       - name: Base para las pruebas de la aplicación
@@ -46,6 +46,10 @@ jobs:
           INV_DB: inventario_ci
           INV_CLAVE: clave_ci
         run: mvn -B verify -Dtest='*' -Dsurefire.failIfNoSpecifiedTests=false
+
+      - name: Compilar la versión web y ejecutar sus pruebas
+        working-directory: web
+        run: mvn -B package
 
       - name: Armar el paquete de instalación para Windows
         run: instalacion/empaquetar.sh

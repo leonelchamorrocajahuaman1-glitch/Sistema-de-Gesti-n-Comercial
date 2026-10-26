@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head(${modo.titulo})}"></head>
+<body>
+<nav th:replace="~{fragmentos/base :: menu}"></nav>
+<main class="container-fluid px-3 px-lg-4" id="movimiento"
+      th:attr="data-modo=${modo.name()},data-api=@{/api/producto}">
+    <h1 class="h3 titulo" th:text="${modo.titulo}">Movimiento</h1>
+    <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+    <form th:action="@{'/' + ${modo.ruta}}" method="post" id="formDocumento" data-un-envio>
+        <!-- Cabecera del documento -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <h2 class="h6 text-secondary">Documento</h2>
+                <div class="row g-2">
+                    <div class="col-sm-6 col-lg-3" th:if="${modo.name() != 'TRANSFERENCIA'}">
+                        <label for="tipo" class="form-label">Tipo</label>
+                        <select class="form-select" id="tipo" name="tipo">
+                            <option th:each="t : ${tipos}" th:value="${t}" th:text="${@fmt.tipo(t)}"
+                                    th:selected="${t == f.tipo}">Tipo</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label for="almacen" class="form-label"
+                               th:text="${modo.name() == 'TRANSFERENCIA'} ? 'Almacén origen' : 'Almacén'">Almacén</label>
+                        <select class="form-select" id="almacen" name="almacen">
+                            <option th:each="a : ${almacenes}" th:value="${a.id}" th:text="${a.texto}"
+                                    th:selected="${a.idEntero() == f.almacen}">Almacén</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-lg-3" th:if="${modo.name() == 'TRANSFERENCIA'}">
+                        <label for="destino" class="form-label">Almacén destino</label>
+                        <select class="form-select" id="destino" name="destino">
+                            <option th:each="a : ${almacenes}" th:value="${a.id}" th:text="${a.texto}"
+                                    th:selected="${a.idEntero() == f.destino}">Almacén</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label for="referencia" class="form-label" th:text="${modo.etiquetaReferencia}">Referencia</label>
+                        <input class="form-control" id="referencia" name="referencia" maxlength="60" th:value="${f.referencia}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingreso de líneas (no se envía: el botón Agregar las pasa a la tabla) -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <h2 class="h6 text-secondary">Agregar producto</h2>
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-lg-4">
+                        <label for="nProducto" class="form-label">Producto</label>
+                        <select class="form-select" id="nProducto" form="sinEnvio">
+                            <option value="">Seleccione…</option>
+                            <option th:each="p : ${productos}" th:value="${p.id}" th:text="${p.texto}">Producto</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-sm-4 col-lg-2">
+                        <label for="nCantidad" class="form-label">Cantidad</label>
+                        <input class="form-control" type="number" min="0" step="any" id="nCantidad" form="sinEnvio">
+                    </div>
+                    <div class="col-6 col-sm-4 col-lg-2" th:if="${modo.etiquetaImporte != null}">
+                        <label for="nImporte" class="form-label" th:text="${modo.etiquetaImporte}">Importe</label>
+                        <input class="form-control" type="number" min="0" step="any" id="nImporte" form="sinEnvio">
+                    </div>
+                    <th:block th:if="${modo.name() == 'ENTRADA'}">
+                        <div class="col-6 col-sm-4 col-lg-2">
+                            <label for="nLote" class="form-label">Lote</label>
+                            <input class="form-control" id="nLote" maxlength="40" form="sinEnvio">
+                        </div>
+                        <div class="col-6 col-sm-4 col-lg-2">
+                            <label for="nVence" class="form-label">Vence</label>
+                            <input class="form-control" type="date" id="nVence" form="sinEnvio">
+                        </div>
+                    </th:block>
+                    <div class="col-12 col-sm-8 col-lg-3" th:if="${modo.name() != 'ENTRADA'}">
+                        <label for="nLote" class="form-label">Lote</label>
+                        <select class="form-select" id="nLote" form="sinEnvio">
+                            <option value="">Automático (FEFO / PEPS)</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-4 col-lg-auto">
+                        <button type="button" class="btn btn-success w-100" id="btnAgregar">
+                            <i class="bi bi-plus-lg"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="small text-primary mt-2" id="infoProducto" aria-live="polite"></div>
+                <div class="small text-danger mt-1" id="errorLinea" aria-live="assertive"></div>
+            </div>
+        </div>
+
+        <!-- Líneas del documento -->
+        <div class="table-responsive tabla-datos mb-3">
+            <table class="table table-sm align-middle mb-0" id="tablaLineas">
+                <thead class="table-light">
+                <tr>
+                    <th>Producto</th><th>Descripción</th><th class="text-end">Cantidad</th>
+                    <th class="text-end" th:if="${modo.etiquetaImporte != null}" th:text="${modo.etiquetaImporte}">Importe</th>
+                    <th>Lote</th>
+                    <th th:if="${modo.name() == 'ENTRADA'}">Vencimiento</th>
+                    <th class="text-end" th:if="${modo.etiquetaImporte != null}">Importe</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Al volver con un error se muestran las líneas que ya se habían agregado. -->
+                <tr th:each="l, i : ${f.lineas}" class="linea">
+                    <td class="fw-semibold" th:text="${l.producto}">COD</td>
+                    <td th:text="${l.descripcion}">Descripción</td>
+                    <td class="text-end" th:text="${l.cantidad}">0</td>
+                    <td class="text-end" th:if="${modo.etiquetaImporte != null}" th:text="${l.importe}">0</td>
+                    <td th:text="${#strings.isEmpty(l.lote)} ? (${modo.name() == 'ENTRADA'} ? '' : 'Automático') : ${l.loteTexto ?: l.lote}">Lote</td>
+                    <td th:if="${modo.name() == 'ENTRADA'}" th:text="${l.vencimiento}">Vence</td>
+                    <td class="text-end importe" th:if="${modo.etiquetaImporte != null}"></td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-outline-danger btn-sm quitar" aria-label="Quitar línea">
+                            <i class="bi bi-trash"></i></button>
+                        <input type="hidden" data-campo="producto" th:value="${l.producto}">
+                        <input type="hidden" data-campo="descripcion" th:value="${l.descripcion}">
+                        <input type="hidden" data-campo="cantidad" th:value="${l.cantidad}">
+                        <input type="hidden" data-campo="importe" th:value="${l.importe}">
+                        <input type="hidden" data-campo="lote" th:value="${l.lote}">
+                        <input type="hidden" data-campo="loteTexto" th:value="${l.loteTexto}">
+                        <input type="hidden" data-campo="vencimiento" th:value="${l.vencimiento}">
+                    </td>
+                </tr>
+                <tr id="sinLineas"><td colspan="8" class="text-center text-secondary py-3">
+                    Aún no agregó productos.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
+            <button type="button" class="btn btn-outline-secondary" id="btnLimpiar"><i class="bi bi-eraser"></i> Limpiar</button>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <span class="fs-5 fw-bold" th:if="${modo.etiquetaImporte != null}">Total: S/ <span id="total">0.00</span></span>
+                <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-check2-circle"></i>
+                    <span th:text="${modo.boton}">Registrar</span></button>
+            </div>
+        </div>
+    </form>
+    <!-- Formulario vacío: los campos de "Agregar producto" apuntan aquí para no enviarse. -->
+    <form id="sinEnvio" hidden></form>
+</main>
+<th:block th:replace="~{fragmentos/base :: scripts}"></th:block>
+<script th:src="@{/js/movimiento.js}"></script>
+</body>
+</html>

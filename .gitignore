@@ -1,6 +1,10 @@
 *.log
 .env
 dist/
+# Registro de eventos de la versión web (incluye archivos rotados .log.AAAA-MM-DD.N.gz)
+logs/
+# Configuración local del navegador integrado de Claude Code
+.claude/
 # Generados por el instalador de Windows: contienen la contraseña de red
 conexion.properties
 PARA_COMPUTADORAS_CLIENTE/

@@ -1,5 +1,9 @@
 # Instalación en red local: una computadora como servidor
 
+> **¿Prefiere que las otras PC no instalen nada?** Use la **versión web**: solo el
+> servidor la instala y los demás abren el navegador. Guía: [VERSION_WEB.md](VERSION_WEB.md).
+> Esta página describe la versión de escritorio (Java en cada computadora).
+
 ```mermaid
 flowchart LR
     subgraph PC1["Computadora 1 — SERVIDOR"]

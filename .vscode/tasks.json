@@ -17,7 +17,6 @@
       "command": "./mvnw -B package -DskipTests",
       "windows": { "command": ".\\mvnw.cmd -B package -DskipTests" },
       "options": { "cwd": "${workspaceFolder}/aplicacion" },
-      "group": { "kind": "build", "isDefault": true },
       "problemMatcher": []
     },
     {
@@ -27,6 +26,26 @@
       "command": "java -jar target/sistema-gestion.jar",
       "options": { "cwd": "${workspaceFolder}/aplicacion" },
       "dependsOn": "2. Compilar programa",
+      "problemMatcher": []
+    },
+    {
+      "label": "Web: compilar",
+      "detail": "Genera web/target/sistema-web.jar y ejecuta las pruebas (no requiere Maven instalado).",
+      "type": "shell",
+      "command": "./mvnw -B package",
+      "windows": { "command": ".\\mvnw.cmd -B package" },
+      "options": { "cwd": "${workspaceFolder}/web" },
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Web: ejecutar para probar",
+      "detail": "Inicia la página en http://localhost:8080 (Ctrl+C para detener). Detenga antes el sistema instalado.",
+      "type": "shell",
+      "command": "java -jar web/target/sistema-web.jar",
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": "Web: compilar",
+      "isBackground": false,
       "problemMatcher": []
     }
   ]

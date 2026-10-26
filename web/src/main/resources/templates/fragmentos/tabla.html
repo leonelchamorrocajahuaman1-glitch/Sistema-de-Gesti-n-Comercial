@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Tabla genérica para un Bd.Resultado.
+  res: resultado; anulable: true para mostrar el botón "Anular" (reporte de documentos, administrador).
+-->
+<div th:fragment="tabla(res, anulable)" class="table-responsive tabla-datos">
+    <table class="table table-sm table-striped table-hover align-middle mb-0">
+        <thead class="table-light">
+        <tr>
+            <th th:each="c : ${res.columnas}" th:text="${@fmt.titulo(c)}">Columna</th>
+            <th th:if="${anulable}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="fila : ${res.filas}">
+            <td th:each="v, i : ${fila}"
+                th:with="col=${res.columnas[i.index]}"
+                th:classappend="${@fmt.esNumero(v)} ? 'text-end text-nowrap'">
+                <th:block th:switch="${col}">
+                    <span th:case="'tipo'" th:text="${@fmt.tipo(v)}"></span>
+                    <span th:case="'rol'" th:text="${@fmt.tipo(v)}"></span>
+                    <span th:case="'bajo_minimo'" th:class="${v} ? 'badge text-bg-danger'" th:text="${@fmt.valor(v)}"></span>
+                    <span th:case="'estado'"
+                          th:class="${v == 'VENCIDO' or v == 'ANULADO'} ? 'badge text-bg-danger' : (${v == 'POR VENCER'} ? 'badge text-bg-warning' : '')"
+                          th:text="${v}"></span>
+                    <span th:case="*" th:text="${@fmt.valor(v)}"></span>
+                </th:block>
+            </td>
+            <td th:if="${anulable}" class="text-end">
+                <button type="button" class="btn btn-outline-danger btn-sm"
+                        th:if="${res.valor(fila, 'estado') == 'PROCESADO' and res.valor(fila, 'tipo') != 'ANULACION'}"
+                        data-bs-toggle="modal" data-bs-target="#modalAnular"
+                        th:attr="data-documento=${res.valor(fila, 'documento')},data-tipo=${@fmt.tipo(res.valor(fila, 'tipo'))}">
+                    <i class="bi bi-x-circle"></i> Anular
+                </button>
+            </td>
+        </tr>
+        <tr th:if="${res.filas.isEmpty()}">
+            <td th:colspan="${res.columnas.size() + 1}" class="text-center text-secondary py-4">Sin datos para mostrar.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

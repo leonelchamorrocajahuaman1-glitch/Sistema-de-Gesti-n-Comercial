@@ -1,0 +1,80 @@
+/* Sistema de Gestión Comercial - estilos propios (sobre Bootstrap 5) */
+:root {
+    --sg-azul-oscuro: #1f3a5f;
+    --sg-azul: #2563eb;
+    --sg-verde: #15803d;
+    --sg-rojo: #b91c1c;
+    --sg-ambar: #b45309;
+}
+
+body {
+    background: #f3f5f8;
+    color: #1f2937;
+}
+
+.barra {
+    background: var(--sg-azul-oscuro);
+}
+
+.barra .nav-link.active {
+    background: rgba(255, 255, 255, .15);
+    border-radius: .375rem;
+}
+
+.titulo {
+    color: var(--sg-azul-oscuro);
+    font-weight: 600;
+}
+
+.fondo-login {
+    background: linear-gradient(135deg, #1f3a5f 0%, #2d5286 100%);
+}
+
+/* Tarjetas de indicadores del inicio */
+.kpi {
+    border: 0;
+    border-left: 4px solid var(--kpi-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+}
+.kpi-azul { --kpi-color: var(--sg-azul); }
+.kpi-verde { --kpi-color: var(--sg-verde); }
+.kpi-rojo { --kpi-color: var(--sg-rojo); }
+.kpi-ambar { --kpi-color: var(--sg-ambar); }
+.kpi-titulo {
+    color: #6b7280;
+    font-size: .85rem;
+}
+.kpi-valor {
+    color: var(--kpi-color);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+a.kpi:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+}
+
+/* Tablas: fondo blanco, desplazamiento horizontal en pantallas pequeñas */
+.tabla-datos {
+    background: #fff;
+    border-radius: .5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+    max-height: 70vh;
+}
+.tabla-datos thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: .85rem;
+}
+.tabla-datos td {
+    font-size: .9rem;
+}
+
+@media (max-width: 576px) {
+    .kpi-valor {
+        font-size: 1.25rem;
+    }
+}

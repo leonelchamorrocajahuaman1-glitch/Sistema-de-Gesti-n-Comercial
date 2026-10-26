@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head('Almacenes')}"></head>
+<body>
+<nav th:replace="~{fragmentos/base :: menu}"></nav>
+<main class="container-fluid px-3 px-lg-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h1 class="h3 titulo mb-0">Almacenes</h1>
+        <a class="btn btn-primary btn-sm" th:href="@{/almacenes/nuevo}"><i class="bi bi-plus-lg"></i> Nuevo almacén</a>
+    </div>
+    <div th:replace="~{fragmentos/base :: mensajes}"></div>
+    <div class="table-responsive tabla-datos">
+        <table class="table table-sm table-striped table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr><th>Código</th><th>Nombre</th><th>Dirección</th><th>Activo</th>
+                <th class="text-end">Productos con stock</th><th class="text-end">Valor total</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="f : ${almacenes.filas}" th:classappend="${!f[4]} ? 'text-secondary'">
+                <td class="fw-semibold text-nowrap" th:text="${f[1]}">COD</td>
+                <td th:text="${f[2]}">Nombre</td>
+                <td th:text="${f[3]}">Dirección</td>
+                <td th:text="${@fmt.valor(f[4])}">Sí</td>
+                <td class="text-end" th:text="${f[5]}">0</td>
+                <td class="text-end text-nowrap" th:text="${@fmt.valor(f[6])}">0</td>
+                <td class="text-end"><a class="btn btn-outline-primary btn-sm" th:href="@{/almacenes/editar(id=${f[0]})}">
+                    <i class="bi bi-pencil"></i> Editar</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<th:block th:replace="~{fragmentos/base :: scripts}"></th:block>
+</body>
+</html>

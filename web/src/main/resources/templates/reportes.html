@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head('Reportes')}"></head>
+<body>
+<nav th:replace="~{fragmentos/base :: menu}"></nav>
+<main class="container-fluid px-3 px-lg-4">
+    <h1 class="h3 titulo">Reportes</h1>
+
+    <form class="card border-0 shadow-sm mb-3" th:action="@{/reportes}" method="get" id="formReporte">
+        <div class="card-body row g-2 align-items-end">
+            <div class="col-12 col-md-6 col-xl-3">
+                <label for="tipo" class="form-label">Reporte</label>
+                <select class="form-select" id="tipo" name="tipo" data-auto-enviar>
+                    <option th:each="r : ${reportes}" th:value="${r.name()}" th:text="${r.titulo}"
+                            th:selected="${r == f.tipo}">Reporte</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-6 col-xl-2">
+                <label for="almacen" class="form-label">Almacén</label>
+                <select class="form-select" id="almacen" name="almacen">
+                    <option value="">(todos)</option>
+                    <option th:each="a : ${almacenes}" th:value="${a.id}" th:text="${a.texto}"
+                            th:selected="${a.idEntero() == f.almacen}">Almacén</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <label for="producto" class="form-label">Producto</label>
+                <select class="form-select" id="producto" name="producto">
+                    <option value="">(todos)</option>
+                    <option th:each="p : ${productos}" th:value="${p.id}" th:text="${p.texto}"
+                            th:selected="${p.id == f.producto}">Producto</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-xl-1">
+                <label for="desde" class="form-label">Desde</label>
+                <input class="form-control" type="date" id="desde" name="desde" th:value="${f.desde}">
+            </div>
+            <div class="col-6 col-md-3 col-xl-1">
+                <label for="hasta" class="form-label">Hasta</label>
+                <input class="form-control" type="date" id="hasta" name="hasta" th:value="${f.hasta}">
+            </div>
+            <div class="col-12 col-xl-2 d-flex gap-2">
+                <button class="btn btn-primary flex-fill" type="submit"><i class="bi bi-play-fill"></i> Generar</button>
+                <button class="btn btn-outline-success flex-fill" type="submit" th:formaction="@{/reportes/csv}"
+                        title="Descargar para abrir en Excel"><i class="bi bi-file-earmark-spreadsheet"></i> CSV</button>
+            </div>
+        </div>
+    </form>
+
+    <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+    <th:block th:if="${resultado != null}">
+        <p class="small text-secondary mb-1">
+            <span th:text="${f.tipo.titulo}">Reporte</span> ·
+            <span th:text="${resultado.filas.size()}">0</span> fila(s)
+        </p>
+        <div th:replace="~{fragmentos/tabla :: tabla(${resultado}, ${f.tipo.name() == 'DOCUMENTOS' and u.esAdministrador()})}"></div>
+    </th:block>
+
+    <!-- Anulación de documentos (solo administradores) -->
+    <div class="modal fade" id="modalAnular" tabindex="-1" aria-labelledby="tituloAnular" aria-hidden="true"
+         th:if="${u.esAdministrador()}">
+        <div class="modal-dialog">
+            <form class="modal-content" th:action="@{/reportes/anular}" method="post" data-un-envio>
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="tituloAnular">Anular documento N° <span id="anularNumero"></span></h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-secondary">Se generará un documento de reversión que devuelve el stock.
+                        Esta acción no se puede deshacer.</p>
+                    <input type="hidden" name="documento" id="anularDocumento">
+                    <input type="hidden" name="almacen" th:value="${f.almacen}">
+                    <input type="hidden" name="desde" th:value="${f.desde}">
+                    <input type="hidden" name="hasta" th:value="${f.hasta}">
+                    <label for="motivo" class="form-label">Motivo de la anulación (<span id="anularTipo"></span>)</label>
+                    <textarea class="form-control" id="motivo" name="motivo" rows="2" maxlength="300" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle"></i> Anular documento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragmentos/base :: scripts}"></th:block>
+</body>
+</html>

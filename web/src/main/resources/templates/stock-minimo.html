@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: head('Stock mínimo')}"></head>
+<body>
+<nav th:replace="~{fragmentos/base :: menu}"></nav>
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <h1 class="h3 titulo">Stock mínimo</h1>
+            <p class="text-secondary">
+                <strong th:text="${producto.codigo}">COD</strong> · <span th:text="${producto.nombre}">Nombre</span>.
+                Cuando el stock de un almacén baje a este nivel se genera una alerta.
+            </p>
+            <div th:replace="~{fragmentos/base :: mensajes}"></div>
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <form class="row g-2 align-items-end" th:action="@{/productos/stock-minimo}" method="post" data-un-envio>
+                        <input type="hidden" name="codigo" th:value="${producto.codigo}">
+                        <div class="col-sm-6">
+                            <label for="almacen" class="form-label">Almacén</label>
+                            <select class="form-select" id="almacen" name="almacen" required>
+                                <option th:each="a : ${almacenes}" th:value="${a.id}" th:text="${a.texto}">Almacén</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="minimo" class="form-label">Stock mínimo</label>
+                            <input class="form-control" type="number" min="0" step="any" id="minimo" name="minimo" required>
+                        </div>
+                        <div class="col-sm-3">
+                            <button class="btn btn-primary w-100" type="submit"><i class="bi bi-check-lg"></i> Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <h2 class="h6">Situación actual por almacén</h2>
+            <div th:replace="~{fragmentos/tabla :: tabla(${minimos}, false)}"></div>
+            <a class="btn btn-outline-secondary mt-3" th:href="@{/productos}"><i class="bi bi-arrow-left"></i> Volver a productos</a>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragmentos/base :: scripts}"></th:block>
+</body>
+</html>
